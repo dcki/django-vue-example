@@ -7,5 +7,10 @@ def index(request: HttpRequest) -> HttpResponse:
     notes = Note.objects.all()
     
     return render(request, 'notes/index.html', {
-        'notes': notes,
+        'notes': [
+            {
+                'content': note.content,
+            }
+            for note in notes
+        ],
     })

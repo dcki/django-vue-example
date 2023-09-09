@@ -11,3 +11,8 @@
 - `EOF`
 - `python3 manage.py runserver`
 - View [http://127.0.0.1:8000/notes/](http://127.0.0.1:8000/notes/)
+
+To do:
+- Production:
+    - Update Django settings.
+    - Use production version of Vue.
