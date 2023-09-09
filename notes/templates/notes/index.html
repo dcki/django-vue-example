@@ -5,6 +5,7 @@
         <script type="importmap">
           {
               "imports": {
+                  "js-cookie": "https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/+esm",
                   "vue": "https://unpkg.com/vue@3/dist/vue.esm-browser.js"
               }
           }
@@ -23,6 +24,7 @@
 
         <script type="module">
             import { createApp } from 'vue';
+            import jsCookie from 'js-cookie';
 
             createApp({
                 data() {
@@ -53,6 +55,9 @@
                                     id: note.id,
                                     content: note.content,
                                 },
+                                {
+                                    'X-CSRFTOKEN': jsCookie.get('csrftoken'),
+                                },
                             );
                             if (response.status === 200) {
                                 note._saveState = 'ok';
@@ -67,12 +72,13 @@
                 },
             }).mount('#app');
 
-            async function postData(url, data) {
+            async function postData(url, data, headers) {
                 return await fetch(url, {
                     method: 'POST',
                     cache: 'no-cache',
                     headers: {
                         'Content-Type': 'application/json',
+                        ...headers,
                     },
                     body: JSON.stringify(data),
                 });

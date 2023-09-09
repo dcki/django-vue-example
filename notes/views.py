@@ -3,7 +3,6 @@ from django.http import (
     HttpResponseBadRequest, HttpResponseNotFound,
 )
 from django.shortcuts import render
-from django.views.decorators.csrf import csrf_exempt
 import json
 from notes.models import Note
 
@@ -22,8 +21,10 @@ def index(request: HttpRequest) -> HttpResponse:
     })
 
 
-@csrf_exempt
 def update_note(request: HttpRequest) -> HttpResponse:
+    if not request.user.is_authenticated:
+        return HttpResponse(status=401)
+    
     try:
         body = json.loads(request.body)
     except ValueError:
