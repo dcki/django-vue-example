@@ -13,6 +13,8 @@
 - View [http://127.0.0.1:8000/notes/](http://127.0.0.1:8000/notes/)
 
 To do:
+- Implement login.
+- Require login on views.
 - Production:
     - Update Django settings.
     - Use production version of Vue.
