@@ -1,0 +1,8 @@
+- Install Python 3.11 (for example, with pyenv)
+- Install Poetry
+- `python3 -m venv .venv`
+- `poetry env use .venv`
+- `poetry install`
+- `source .venv/bin/activate`
+- `python3 manage.py migrate`
+- `python3 manage.py runserver`
