@@ -16,8 +16,21 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import include, path
+from . import views
 
 urlpatterns = [
+    # Admin
     path('admin/', admin.site.urls),
+    
+    # Root
+    path('', views.root, name='root'),
+    
+    # Accounts
+    # Django looks for templates for login in '*/templates/registration/'
+    # by default. Search for "template_name" here:
+    # https://docs.djangoproject.com/en/4.2/topics/auth/default/#module-django.contrib.auth.views
+    path('accounts/', include('django.contrib.auth.urls')),
+    
+    # Notes
     path('notes/', include('notes.urls')),
 ]

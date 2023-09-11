@@ -13,8 +13,7 @@
 - View [http://127.0.0.1:8000/notes/](http://127.0.0.1:8000/notes/)
 
 To do:
-- Implement login.
-- Require login on views.
+- When client receives 403 response, determine if it's due to an invalid CSRF token (which indicates a client-side bug) or due to the user not having permission. Or, should CSRF failure respond with 401 instead?
 - Production:
     - Update Django settings.
     - Use production version of Vue.

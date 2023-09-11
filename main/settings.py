@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'main',
     'notes',
+    'registration',
 ]
 
 MIDDLEWARE = [
@@ -70,6 +71,12 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'main.wsgi.application'
+
+# The URL or named URL pattern where requests are redirected after login when the LoginView doesn’t get a next GET parameter.
+LOGIN_REDIRECT_URL = 'root'
+
+# The URL or named URL pattern where requests are redirected after logout if LogoutView doesn’t have a next_page attribute.
+LOGOUT_REDIRECT_URL = 'login'
 
 
 # Database

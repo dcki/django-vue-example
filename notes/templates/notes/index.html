@@ -1,6 +1,11 @@
 {% extends 'main/base.html' %}
 
 {% block content %}
+    <div>
+        <a href="{% url 'login' %}">Log in</a>
+        <a href="{% url 'logout' %}">Log out</a>
+    </div>
+
     <div id="app"></div>
 
     {{ notes|json_script:"notes-data" }}
@@ -9,28 +14,29 @@
         for (const note of notes) {
             note._saveState = 'ok';
         }
+
+        const appData = {
+            notes: notes,
+            requestFailedMessage: null,
+        };
     </script>
 
     <script type="module">
         import { createApp } from 'vue';
         import jsCookie from 'js-cookie';
 
-        createApp({
-            data() {
-                return {
-                    notes: notes,
-                };
+        const Notes = {
+            props: {
+                notes: { type: Array, required: true },
             },
             delimiters: ['[[', ']]'],
             template: `
-                <div id="app">
-                    <div v-for="note in notes">
-                        <textarea v-model="note.content"></textarea>
-                        <button @click="save(note)">Save</button>
-                        <div>
-                            <span v-if="note._saveState === 'saving'">Saving...</span>
-                            <span v-else-if="note._saveState === 'failed'">Save failed</span>
-                        </div>
+                <div v-for="note in notes">
+                    <textarea v-model="note.content"></textarea>
+                    <button @click="save(note)">Save</button>
+                    <div>
+                        <span v-if="note._saveState === 'saving'">Saving...</span>
+                        <span v-else-if="note._saveState === 'failed'">Save failed</span>
                     </div>
                 </div>
             `,
@@ -59,10 +65,66 @@
                     }
                 },
             },
-        }).mount('#app');
+        };
+
+        const RequestFailedDialog = {
+            data() {
+                return {
+                    message: null,
+                };
+            },
+            delimiters: ['[[', ']]'],
+            template: `
+                <dialog ref="dialog">
+                    <p>[[ message ]]</p>
+                    <p><a href="/accounts/login/" target="_blank">Click here to log in</a></p>
+                    <button @click="$emit('clicked-hide')">OK</button>
+                </dialog>
+            `,
+            methods: {
+                show(message) {
+                    this.message = message;
+                    this.$refs.dialog.showModal();
+                },
+                hide() {
+                    this.$refs.dialog.close();
+                },
+            },
+        };
+
+        const vueApp = createApp({
+            components: {
+                Notes,
+                RequestFailedDialog,
+            },
+            data() {
+                return appData;
+            },
+            delimiters: ['[[', ']]'],
+            template: `
+                <notes :notes="notes"></notes>
+                <request-failed-dialog
+                    ref="requestFailedDialog"
+                    @clicked-hide="$refs.requestFailedDialog.hide()"
+                ></request-failed-dialog>
+            `,
+            watch: {
+                requestFailedMessage() {
+                    if (this.requestFailedMessage != null) {
+                        this.$refs.requestFailedDialog.show();
+                    }
+                },
+            },
+            methods: {
+                showRequestFailedDialog(message) {
+                    this.$refs.requestFailedDialog.show(message);
+                },
+            },
+        });
+        const rootComponent = vueApp.mount('#app');
 
         async function postData(url, data, headers) {
-            return await fetch(url, {
+            const response = await fetch(url, {
                 method: 'POST',
                 cache: 'no-cache',
                 headers: {
@@ -71,6 +133,17 @@
                 },
                 body: JSON.stringify(data),
             });
+
+            if (response.status === 401) {
+                rootComponent.showRequestFailedDialog('Request failed. Please log in.');
+            } else if (response.status === 403) {
+                // NOTE: Reminder: 403 can occur if the client fails to send
+                //       a valid CSRF token (a non-empty token that is
+                //       associated with a session that still exists).
+                rootComponent.showRequestFailedDialog('Request failed. Logging in again may help. If not, the failure may be occurring because you do not have permission to make that request.');
+            }
+
+            return response;
         }
     </script>
 {% endblock %}
