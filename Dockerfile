@@ -4,6 +4,7 @@ WORKDIR /app/
 
 RUN apt update && apt install -y \
     curl \
+    libpq-dev \
 && rm -rf /var/lib/apt/lists/*
 
 # Install Poetry

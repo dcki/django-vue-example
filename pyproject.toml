@@ -9,6 +9,7 @@ packages = []
 [tool.poetry.dependencies]
 python = "^3.11"
 django = "^4.2.5"
+psycopg = "^3.1.10"
 
 
 [build-system]
