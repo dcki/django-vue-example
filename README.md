@@ -15,5 +15,8 @@
 To do:
 - When client receives 403 response, determine if it's due to an invalid CSRF token (which indicates a client-side bug) or due to the user not having permission. Or, should CSRF failure respond with 401 instead?
 - Production:
+    - Use PostgreSQL instead of Sqlite.
+    - Use Docker, Gunicorn, and Nginx.
     - Update Django settings.
     - Use production version of Vue.
+    - Run database migrations inside VPC (datacenter) instead of from laptop.
