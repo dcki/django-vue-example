@@ -1,88 +1,76 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="UTF-8" />
-        <script type="importmap">
-          {
-              "imports": {
-                  "js-cookie": "https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/+esm",
-                  "vue": "https://unpkg.com/vue@3/dist/vue.esm-browser.js"
-              }
-          }
-        </script>
-    </head>
-    <body>
-        <div id="app"></div>
+{% extends 'main/base.html' %}
 
-        {{ notes|json_script:"notes-data" }}
-        <script>
-            var notes = JSON.parse(document.querySelector('#notes-data').textContent);
-            for (const note of notes) {
-                note._saveState = 'ok';
-            }
-        </script>
+{% block content %}
+    <div id="app"></div>
 
-        <script type="module">
-            import { createApp } from 'vue';
-            import jsCookie from 'js-cookie';
+    {{ notes|json_script:"notes-data" }}
+    <script>
+        var notes = JSON.parse(document.querySelector('#notes-data').textContent);
+        for (const note of notes) {
+            note._saveState = 'ok';
+        }
+    </script>
 
-            createApp({
-                data() {
-                    return {
-                        notes: notes,
-                    };
-                },
-                delimiters: ['[[', ']]'],
-                template: `
-                    <div id="app">
-                        <div v-for="note in notes">
-                            <textarea v-model="note.content"></textarea>
-                            <button @click="save(note)">Save</button>
-                            <div>
-                                <span v-if="note._saveState === 'saving'">Saving...</span>
-                                <span v-else-if="note._saveState === 'failed'">Save failed</span>
-                            </div>
+    <script type="module">
+        import { createApp } from 'vue';
+        import jsCookie from 'js-cookie';
+
+        createApp({
+            data() {
+                return {
+                    notes: notes,
+                };
+            },
+            delimiters: ['[[', ']]'],
+            template: `
+                <div id="app">
+                    <div v-for="note in notes">
+                        <textarea v-model="note.content"></textarea>
+                        <button @click="save(note)">Save</button>
+                        <div>
+                            <span v-if="note._saveState === 'saving'">Saving...</span>
+                            <span v-else-if="note._saveState === 'failed'">Save failed</span>
                         </div>
                     </div>
-                `,
-                methods: {
-                    async save(note) {
-                        try {
-                            note._saveState = 'saving';
-                            const response = await postData(
-                                '/notes/note/update',
-                                {
-                                    id: note.id,
-                                    content: note.content,
-                                },
-                                {
-                                    'X-CSRFTOKEN': jsCookie.get('csrftoken'),
-                                },
-                            );
-                            if (response.status === 200) {
-                                note._saveState = 'ok';
-                            } else {
-                                note._saveState = 'failed';
-                            }
-                        } catch(e) {
+                </div>
+            `,
+            methods: {
+                async save(note) {
+                    try {
+                        note._saveState = 'saving';
+                        const response = await postData(
+                            '/notes/note/update',
+                            {
+                                id: note.id,
+                                content: note.content,
+                            },
+                            {
+                                'X-CSRFTOKEN': jsCookie.get('csrftoken'),
+                            },
+                        );
+                        if (response.status === 200) {
+                            note._saveState = 'ok';
+                        } else {
                             note._saveState = 'failed';
-                            throw e;
                         }
-                    },
+                    } catch(e) {
+                        note._saveState = 'failed';
+                        throw e;
+                    }
                 },
-            }).mount('#app');
+            },
+        }).mount('#app');
 
-            async function postData(url, data, headers) {
-                return await fetch(url, {
-                    method: 'POST',
-                    cache: 'no-cache',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        ...headers,
-                    },
-                    body: JSON.stringify(data),
-                });
-            }
-        </script>
-    </body>
-</html>
+        async function postData(url, data, headers) {
+            return await fetch(url, {
+                method: 'POST',
+                cache: 'no-cache',
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...headers,
+                },
+                body: JSON.stringify(data),
+            });
+        }
+    </script>
+{% endblock %}
