@@ -1,7 +1,11 @@
 {% extends 'main/base.html' %}
 
+{% block styles %}
+    <link rel="stylesheet" href="/static/notes/index.css" />
+{% endblock %}
+
 {% block content %}
-    <div>
+    <div class="nav">
         <a href="{% url 'login' %}">Log in</a>
         <a href="{% url 'logout' %}">Log out</a>
     </div>
@@ -31,12 +35,14 @@
             },
             delimiters: ['[[', ']]'],
             template: `
-                <div v-for="note in notes">
-                    <textarea v-model="note.content"></textarea>
-                    <button @click="save(note)">Save</button>
-                    <div>
+                <div v-for="note in notes" class="editable-note">
+                    <textarea v-model="note.content" class="editable-note__input"></textarea>
+                    <button class="editable-note__save-button" @click="save(note)">Save</button>
+                    <div class="editable-note__save-status">
                         <span v-if="note._saveState === 'saving'">Saving...</span>
                         <span v-else-if="note._saveState === 'failed'">Save failed</span>
+                        <!-- Reserve space when not visible. -->
+                        <span v-else style="visibility: hidden;">&nbsp;</span>
                     </div>
                 </div>
             `,

@@ -14,6 +14,7 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+from django.conf import settings
 from django.contrib import admin
 from django.urls import include, path
 from . import views
@@ -34,3 +35,8 @@ urlpatterns = [
     # Notes
     path('notes/', include('notes.urls')),
 ]
+
+if settings.DEBUG:
+    # Serve static files with runserver
+    from django.contrib.staticfiles.urls import staticfiles_urlpatterns
+    urlpatterns += staticfiles_urlpatterns()

@@ -1,0 +1,26 @@
+.nav {
+    background: #fc0390;  /* nothing particular, grabbed from a color picker */
+    display: flex;
+    justify-content: flex-end;
+}
+.nav > a {
+    margin: 5px;
+    padding: 5px;
+    text-decoration: none;
+    color: black;
+    font-size: 32px;
+}
+.editable-note {
+    margin: 10px;
+}
+.editable-note__input {
+    display: block;
+    margin: 5px;
+}
+.editable-note__save-button {
+    display: block;
+    margin: 5px;
+}
+.editable-note__save-status {
+    margin: 5px;
+}
